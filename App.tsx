@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { BookOpen, GraduationCap, Sparkles, ImagePlus, X, CheckCircle2, Shuffle, Zap, Calendar } from 'lucide-react';
+import { BookOpen, GraduationCap, Sparkles, ImagePlus, X, CheckCircle2, Zap, Calendar } from 'lucide-react';
 import Marquee from './components/Marquee';
 import ExamOutput from './components/ExamOutput';
 import AnimatedMascot from './components/AnimatedMascot';
-import { generateQuestions, generateIllustration } from './services/geminiService';
+import { generateQuestions } from './services/geminiService';
 import { ACADEMIC_YEAR, ExamCategory, ExamType, GeneratedExam, QuestionType } from './types';
 import { CURRICULUM_DATA, TKA_TOPICS } from './constants';
 
@@ -13,22 +13,20 @@ function App() {
   const [activeTab, setActiveTab] = useState<ExamCategory>(ExamCategory.REGULAR);
   const [generatedData, setGeneratedData] = useState<GeneratedExam | null>(null);
   const [loading, setLoading] = useState(false);
-  const [loadingStage, setLoadingStage] = useState<string>(""); 
   const [progress, setProgress] = useState(0); 
-  const [imageProgress, setImageProgress] = useState<{ current: number; total: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Image Upload State
+  // Global Image Upload (Header/Watermark/Common)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
 
   // Shuffle Settings
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
   const [shuffleOptions, setShuffleOptions] = useState(false);
 
-  // Form State - Regular (Locked to Semester 2)
+  // Form State - Regular (Locked to Kelas 6 & Semester 2)
   const [year] = useState(ACADEMIC_YEAR);
   const [semester] = useState<string>("Semester 2");
-  const [classLevel, setClassLevel] = useState<string>("Kelas 4");
+  const [classLevel] = useState<string>("Kelas 6"); 
   const [subject, setSubject] = useState<string>("");
   const [topic, setTopic] = useState<string>(""); 
   const [examType, setExamType] = useState<ExamType>(ExamType.FORMATIF);
@@ -41,7 +39,6 @@ function App() {
   const [tkaQuestionType, setTkaQuestionType] = useState<QuestionType>(QuestionType.MULTIPLE_CHOICE);
   const [tkaCount, setTkaCount] = useState<number>(10);
 
-  // Helper for filtering TKA topics
   const getFilteredTkaTopics = () => {
     if (tkaSubject === "Gabungan") return TKA_TOPICS;
     if (tkaSubject === "Bahasa Indonesia") return TKA_TOPICS.filter(t => t.startsWith("Verbal"));
@@ -53,7 +50,6 @@ function App() {
     setSelectedTkaTopics(prev => prev.includes(topic) ? prev.filter(t => t !== topic) : [...prev, topic]);
   };
 
-  // Logic to determine available topics for Regular
   const availableSubjects = CURRICULUM_DATA[classLevel]?.[semester] || [];
   const currentSubjectData = availableSubjects.find(s => s.name === subject);
   const rawTopics = currentSubjectData?.topics || [];
@@ -107,14 +103,12 @@ function App() {
     }
 
     setLoading(true);
-    setLoadingStage("text");
-    setImageProgress(null);
     setProgress(0);
     setError(null);
 
     const progressInterval = setInterval(() => {
       setProgress((prev) => prev >= 95 ? 95 : prev + (prev > 70 ? 0.5 : 2));
-    }, 200);
+    }, 150);
 
     try {
       let result: GeneratedExam;
@@ -134,27 +128,7 @@ function App() {
 
       clearInterval(progressInterval);
       setProgress(100);
-      
-      const questionsWithImages = result.questions.filter(q => !!q.imageDescription);
-      if (questionsWithImages.length > 0) {
-        setLoadingStage("images");
-        setImageProgress({ current: 0, total: questionsWithImages.length });
-        let completed = 0;
-        await Promise.all(result.questions.map(async (q) => {
-          if (q.imageDescription) {
-            try {
-              const img = await generateIllustration(q.imageDescription);
-              if (img) q.generatedImage = img;
-            } finally {
-              completed++;
-              setImageProgress({ current: completed, total: questionsWithImages.length });
-            }
-          }
-          return q;
-        }));
-      }
-
-      await new Promise(r => setTimeout(r, 600)); 
+      await new Promise(r => setTimeout(r, 400)); 
       setGeneratedData({ ...result, uploadedImage });
     } catch (err: any) {
       setError(err.message || "Gagal membuat soal. Coba lagi.");
@@ -224,9 +198,10 @@ function App() {
                   <>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 uppercase ml-1">Tingkat Kelas</label>
-                      <select value={classLevel} onChange={(e) => setClassLevel(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border-2 border-transparent rounded-2xl focus:border-blue-500 focus:bg-white transition-all outline-none font-semibold">
-                        {["Kelas 4", "Kelas 5", "Kelas 6"].map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
+                      <div className="w-full px-4 py-3 bg-slate-100 border-2 border-slate-200 rounded-2xl flex items-center gap-2 text-slate-700 font-bold opacity-80">
+                         <CheckCircle2 size={18} className="text-blue-600" />
+                         {classLevel}
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 uppercase ml-1">Semester</label>
@@ -311,10 +286,10 @@ function App() {
                 )}
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase ml-1">Ilustrasi Tambahan</label>
+                  <label className="text-xs font-bold text-slate-500 uppercase ml-1">Logo Instansi (Opsional)</label>
                   <label className={`w-full h-[52px] flex items-center justify-center gap-3 rounded-2xl border-2 border-dashed transition-all cursor-pointer ${uploadedImage ? 'bg-blue-50 border-blue-300' : 'bg-slate-50 border-slate-200 hover:border-blue-400'}`}>
                     <ImagePlus size={18} className={uploadedImage ? 'text-blue-600' : 'text-slate-400'} />
-                    <span className={`text-sm font-bold ${uploadedImage ? 'text-blue-700' : 'text-slate-500'}`}>{uploadedImage ? 'GAMBAR SIAP' : 'UPLOAD GAMBAR'}</span>
+                    <span className={`text-sm font-bold ${uploadedImage ? 'text-blue-700' : 'text-slate-500'}`}>{uploadedImage ? 'LOGO SIAP' : 'UPLOAD LOGO'}</span>
                     <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                   </label>
                 </div>
@@ -342,25 +317,15 @@ function App() {
                      <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                            <div className="w-8 h-8 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"></div>
-                           <span className="text-sm font-black text-blue-900 uppercase">AI sedang memproses soal...</span>
+                           <span className="text-sm font-black text-blue-900 uppercase">AI sedang merancang soal teks...</span>
                         </div>
                         <span className="text-xl font-black text-blue-600">{Math.floor(progress)}%</span>
                      </div>
-                     {loadingStage === 'images' && imageProgress && (
-                        <div className="mt-2 space-y-2 border-t border-slate-200 pt-4">
-                           <p className="text-xs font-bold text-purple-600 flex items-center gap-2 italic">
-                             <Sparkles size={14} /> GENERATING ILUSTRASI: {imageProgress.current} / {imageProgress.total}
-                           </p>
-                           <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-                              <div className="h-full bg-purple-600 transition-all duration-500" style={{width: `${(imageProgress.current / imageProgress.total) * 100}%`}}></div>
-                           </div>
-                        </div>
-                     )}
                   </div>
                 ) : (
                   <button type="submit" className={`group w-full py-5 rounded-2xl text-white font-black text-lg shadow-xl transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden active:scale-95 ${activeTab === ExamCategory.REGULAR ? 'bg-blue-600 hover:bg-blue-700' : 'bg-purple-600 hover:bg-purple-700'}`}>
                     <Sparkles size={24} className="group-hover:animate-bounce" /> 
-                    <span className="tracking-widest">GENERATE SEKARANG</span>
+                    <span className="tracking-widest uppercase">Mulai Generate Soal</span>
                   </button>
                 )}
               </div>

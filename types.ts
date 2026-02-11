@@ -19,13 +19,15 @@ export enum ExamType {
 
 export interface Question {
   number: number;
-  stimulusText?: string; // Teks bacaan, tabel, atau stimulus sebelum soal
+  isHots: boolean; // Menandai apakah soal ini High Order Thinking Skills
+  stimulusText?: string; 
   question: string;
-  options?: string[]; // For MC
+  options?: string[]; 
   correctAnswer: string;
   explanation: string;
-  imageDescription?: string; // Deskripsi untuk AI image generation
-  generatedImage?: string | null; // Base64 string gambar yang dihasilkan
+  imageDescription?: string; // Deskripsi untuk panduan guru mencari/membuat gambar
+  imageCaption?: string; // Keterangan Gambar (misal: "Gambar 1.1 Diagram...")
+  generatedImage?: string | null; 
 }
 
 export interface GeneratedExam {
@@ -38,7 +40,7 @@ export interface GeneratedExam {
     year: string;
   };
   questions: Question[];
-  uploadedImage?: string | null; // Global fallback
+  uploadedImage?: string | null; 
 }
 
 export interface CurriculumMap {

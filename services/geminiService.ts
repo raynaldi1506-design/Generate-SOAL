@@ -4,7 +4,6 @@ import { ExamType, QuestionType, GeneratedExam, Question } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-// Utility to shuffle an array
 const shuffleArray = <T>(array: T[]): T[] => {
   const newArray = [...array];
   for (let i = newArray.length - 1; i > 0; i--) {
@@ -23,7 +22,7 @@ export const generateQuestions = async (
     subject?: string;
     topic: string;
     examType?: ExamType;
-    questionType?: QuestionType; // specific for TKA
+    questionType?: QuestionType; 
     count: number;
     shuffleQuestions?: boolean;
     shuffleOptions?: boolean;
@@ -31,43 +30,38 @@ export const generateQuestions = async (
 ): Promise<GeneratedExam> => {
 
   const model = "gemini-3-flash-preview";
-
   let prompt = "";
   let title = "";
 
   if (category === 'REGULAR') {
-    const typeLabel = details.examType?.toUpperCase() || "UJIAN";
-    title = `${typeLabel} - ${details.subject}`;
+    title = (details.examType || "ASESMEN").toUpperCase();
     
     prompt = `
-      Bertindaklah sebagai Pakar Pembuat Soal Kurikulum Merdeka (Asesmen Nasional/AKM).
+      Bertindaklah sebagai Pakar Pembuat Soal Kurikulum Merdeka (Asesmen Nasional/AKM) untuk tingkat Sekolah Dasar.
       Buatkan ${details.count} butir soal untuk mata pelajaran ${details.subject} Kelas ${details.classLevel}, Semester ${details.semester}, Tahun Ajaran ${details.year}.
-      Topik Utama: ${details.topic}. Jenis Ujian: ${details.examType}.
+      Topik: ${details.topic}. Jenis Ujian: ${details.examType}.
       
-      PEDOMAN STIMULUS (SANGAT KRITIKAL):
-      1. ANALISIS KEBUTUHAN: 
-         - Jika soal hanya menanyakan fakta langsung/hafalan, JANGAN buat stimulus (biarkan stimulusText kosong).
-         - Jika soal menguji penalaran, literasi, atau numerasi (HOTS), BUATKAN stimulus yang mendalam.
-      2. FORMAT STIMULUS:
-         - TEKS/CERITA: Gunakan paragraf narasi, deskripsi tokoh, atau berita singkat.
-         - TABEL: Jika menyajikan data, gunakan format HTML sederhana <table><tr><td>...</td></tr></table>.
-         - VISUAL: Jika butuh gambar pendukung (grafik, diagram, ilustrasi kejadian), jelaskan di 'imageDescription'.
-      3. KOMBINASI: Sebuah soal bisa memiliki 'stimulusText' (teks/tabel) DAN 'imageDescription' (gambar) sekaligus untuk konteks yang kuat.
-      4. KUNCI JAWABAN: Harus tepat dan berikan 'explanation' yang menjelaskan alur logika jawaban.
+      ATURAN KRITIKAL:
+      1. KUNCI JAWABAN: Properti 'correctAnswer' HARUS HANYA berisi SATU HURUF saja (A, B, C, atau D). JANGAN menuliskan teks jawaban di properti ini.
+      2. KLASIFIKASI HOTS: Variasikan soal LOTS dan HOTS. Tandai HOTS dengan 'isHots: true'.
+      3. STIMULUS GAMBAR: Hanya soal HOTS yang boleh memiliki 'imageDescription'. Soal LOTS biarkan kosong.
+      4. STIMULUS TEKS: Gunakan 'stimulusText' (format HTML table jika data angka) untuk soal literasi/numerasi.
+      5. KUALITAS: Soal harus menantang logika siswa SD. 'explanation' harus mendalam.
     `;
   } else {
     title = `TES KEMAMPUAN AKADEMIK (TKA) - ${details.topic}`;
     prompt = `
-      Bertindaklah sebagai Pembuat Soal TKA (Tes Potensi Akademik) profesional level SD Kelas 6.
+      Bertindaklah sebagai Pembuat Soal TKA (Tes Potensi Akademik) level SD Kelas 6.
       Buatkan ${details.count} butir soal TKA dengan Topik: ${details.topic}.
       Bentuk Soal: ${details.questionType}.
       
-      ATURAN STIMULUS TKA:
-      - Untuk soal Verbal/Logika: Buat stimulus berupa cerita pendek atau premis silogisme di 'stimulusText'.
-      - Untuk soal Numerik: Berikan tabel data atau pola angka di 'stimulusText'.
-      - Untuk soal Spasial: Berikan deskripsi detail gambar di 'imageDescription'.
-      - Gunakan format HTML <table> jika butuh tabel.
-      - Jika soal sangat sederhana, kosongkan stimulus.
+      ATURAN KUNCI JAWABAN:
+      - Properti 'correctAnswer' HARUS HANYA berisi SATU HURUF saja (A, B, C, atau D).
+      - Jika isian (Essay), tuliskan kata kunci jawabannya secara singkat.
+      
+      ATURAN STIMULUS:
+      - Gunakan 'isHots: true' untuk soal logika/spasial.
+      - Berikan 'imageDescription' HANYA jika visual sangat diperlukan.
     `;
   }
 
@@ -85,24 +79,19 @@ export const generateQuestions = async (
               type: Type.OBJECT,
               properties: {
                 number: { type: Type.INTEGER },
-                stimulusText: { 
-                  type: Type.STRING, 
-                  description: "Bacaan/Cerita/Tabel HTML. Kosongkan jika soal tidak memerlukan stimulus teks/data." 
-                },
+                isHots: { type: Type.BOOLEAN },
+                stimulusText: { type: Type.STRING },
                 question: { type: Type.STRING },
                 options: { 
                   type: Type.ARRAY, 
-                  items: { type: Type.STRING },
-                  description: "4 pilihan jawaban. Kosongkan jika Essay." 
+                  items: { type: Type.STRING }
                 },
-                correctAnswer: { type: Type.STRING, description: "Huruf (A-D) atau kunci isian singkat." },
-                explanation: { type: Type.STRING, description: "Pembahasan logis." },
-                imageDescription: { 
-                  type: Type.STRING, 
-                  description: "Deskripsi visual jika soal butuh stimulus gambar." 
-                }
+                correctAnswer: { type: Type.STRING, description: "HANYA HURUF (A, B, C, atau D)" },
+                explanation: { type: Type.STRING },
+                imageDescription: { type: Type.STRING },
+                imageCaption: { type: Type.STRING }
               },
-              required: ["number", "question", "correctAnswer", "explanation"]
+              required: ["number", "isHots", "question", "correctAnswer", "explanation"]
             }
           }
         }
@@ -115,16 +104,18 @@ export const generateQuestions = async (
 
   let questions: Question[] = JSON.parse(rawJSON).questions;
 
-  // Handle shuffling options (preserving correct answer mapping)
   if (details.shuffleOptions) {
     questions = questions.map(q => {
       if (q.options && q.options.length > 0) {
+        // Find original correct text before shuffling
         const correctLetter = q.correctAnswer.trim().toUpperCase();
         const correctIdx = correctLetter.charCodeAt(0) - 65;
+        
         if (correctIdx >= 0 && correctIdx < q.options.length) {
           const correctText = q.options[correctIdx];
           const shuffledOptions = shuffleArray(q.options);
           const newCorrectIdx = shuffledOptions.indexOf(correctText);
+          
           return {
             ...q,
             options: shuffledOptions,
@@ -136,12 +127,10 @@ export const generateQuestions = async (
     });
   }
 
-  // Handle shuffling questions order
   if (details.shuffleQuestions) {
     questions = shuffleArray(questions);
   }
 
-  // Re-numbering
   questions = questions.map((q, idx) => ({
     ...q,
     number: idx + 1
@@ -161,24 +150,5 @@ export const generateQuestions = async (
 };
 
 export const generateIllustration = async (description: string): Promise<string | null> => {
-  try {
-    const response = await ai.models.generateImages({
-      model: 'imagen-4.0-generate-001',
-      prompt: `Clear educational black and white line art illustration for primary school. Subject: ${description}. Plain white background, professional textbook style.`,
-      config: {
-        numberOfImages: 1,
-        aspectRatio: '1:1',
-        outputMimeType: 'image/jpeg',
-      },
-    });
-
-    const base64String = response.generatedImages?.[0]?.image?.imageBytes;
-    if (base64String) {
-      return `data:image/jpeg;base64,${base64String}`;
-    }
-    return null;
-  } catch (error) {
-    console.error("Gagal generate gambar:", error);
-    return null;
-  }
+  return null;
 };
