@@ -182,7 +182,7 @@ const ExamOutput: React.FC<Props> = ({ data, onBack }) => {
       </div>
 
       {/* Main Sheet Container - Paper remains white (WYSIWYG) */}
-      <div className="max-w-[210mm] mx-auto bg-white shadow-2xl print:shadow-none min-h-screen my-8 print:my-0 text-slate-900" style={{ fontFamily: '"Arial Narrow", sans-serif' }}>
+      <div className="max-w-[210mm] mx-auto bg-white shadow-2xl print:shadow-none min-h-screen my-8 print:my-0 text-black dark:text-black" style={{ fontFamily: '"Arial Narrow", sans-serif' }}>
         <div className="p-10 print:p-0">
           {/* Kop Surat Header */}
           <div className="text-center mb-4 border-b-[3px] border-black pb-3 flex items-center justify-center gap-6">
@@ -193,7 +193,7 @@ const ExamOutput: React.FC<Props> = ({ data, onBack }) => {
               <h1 className="text-lg font-bold uppercase tracking-tighter text-black">PEMERINTAH KABUPATEN SIJUNJUNG</h1>
               <h2 className="text-base font-bold uppercase tracking-tighter text-black">DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
               <h3 className="text-3xl font-black uppercase mt-0.5 text-black">SDN 14 ANDOPAN</h3>
-              <p className="text-[10px] italic mt-0.5 text-slate-700 font-bold">Alamat: Jor. Andopan Nagari Lubuak Tarok Kode pos : 27553</p>
+              <p className="text-[10px] italic mt-0.5 text-black font-bold">Alamat: Jor. Andopan Nagari Lubuak Tarok Kode pos : 27553</p>
             </div>
           </div>
 
@@ -218,12 +218,12 @@ const ExamOutput: React.FC<Props> = ({ data, onBack }) => {
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: '"Arial Narrow", sans-serif', fontSize: '11pt', lineHeight: '1.1' }}>
                   <tbody>
                     <tr>
-                      <td style={{ border: 'none', padding: '2pt', width: '20pt', verticalAlign: 'top', textAlign: 'center', fontWeight: 'bold' }}>{q.number}.</td>
-                      <td style={{ border: 'none', padding: '2pt', verticalAlign: 'top', textAlign: 'justify' }}>
+                      <td style={{ border: 'none', padding: '2pt', width: '20pt', verticalAlign: 'top', textAlign: 'center', fontWeight: 'bold', color: 'black' }}>{q.number}.</td>
+                      <td style={{ border: 'none', padding: '2pt', verticalAlign: 'top', textAlign: 'justify', color: 'black' }}>
                         {/* Stimulus Text */}
                         {q.stimulusText && (
                           <div className="stimulus-content" 
-                               style={{ marginBottom: '5pt', padding: '5pt', border: '1px solid #000', backgroundColor: '#fff', lineHeight: '1.1', borderLeft: '3px solid #000', fontSize: '10pt' }} 
+                               style={{ marginBottom: '5pt', padding: '5pt', border: '1px solid #000', backgroundColor: '#fff', lineHeight: '1.1', borderLeft: '3px solid #000', fontSize: '10pt', color: 'black' }} 
                                dangerouslySetInnerHTML={{ __html: q.stimulusText }} 
                           />
                         )}
@@ -234,7 +234,7 @@ const ExamOutput: React.FC<Props> = ({ data, onBack }) => {
                             {q.generatedImage ? (
                               <div className="text-center relative">
                                  <img src={q.generatedImage} alt="Soal" style={{ maxWidth: '100%', height: 'auto', border: '1px solid #000', display: 'inline-block' }} />
-                                 <div className="text-[9pt] italic mt-1">{q.imageCaption}</div>
+                                 <div className="text-[9pt] italic mt-1 text-black">{q.imageCaption}</div>
                                  <button 
                                     onClick={() => removeQuestionImage(idx)}
                                     className="no-print absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -271,9 +271,9 @@ const ExamOutput: React.FC<Props> = ({ data, onBack }) => {
                                HOTS
                             </span>
                           )}
-                          <span className="print:hidden">{q.question}</span>
+                          <span className="print:hidden text-black">{q.question}</span>
                           {/* Format for Print to match Word */}
-                          <span className="hidden print:inline">{q.isHots ? '(HOTS) ' : ''}{q.question}</span>
+                          <span className="hidden print:inline text-black">{q.isHots ? '(HOTS) ' : ''}{q.question}</span>
                         </div>
                         
                         {/* Options Table */}
@@ -282,8 +282,8 @@ const ExamOutput: React.FC<Props> = ({ data, onBack }) => {
                             <tbody>
                               {q.options.map((opt, oIdx) => (
                                 <tr key={oIdx} className="hover:bg-slate-50 transition-colors rounded">
-                                  <td style={{ border: 'none', padding: '2pt', verticalAlign: 'top', width: '18pt', fontWeight: 'bold' }}>{String.fromCharCode(65 + oIdx)}.</td>
-                                  <td style={{ border: 'none', padding: '2pt', verticalAlign: 'top' }}>{opt}</td>
+                                  <td style={{ border: 'none', padding: '2pt', verticalAlign: 'top', width: '18pt', fontWeight: 'bold', color: 'black' }}>{String.fromCharCode(65 + oIdx)}.</td>
+                                  <td style={{ border: 'none', padding: '2pt', verticalAlign: 'top', color: 'black' }}>{opt}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -320,10 +320,10 @@ const ExamOutput: React.FC<Props> = ({ data, onBack }) => {
                   {examData.questions.map((q, i) => (
                     <tr key={i} className="bg-white">
                       <td className="border border-black p-2 text-center font-black text-black text-sm">{q.number}</td>
-                      <td className="border border-black p-2 text-center font-black text-xl text-blue-700">
+                      <td className="border border-black p-2 text-center font-black text-xl text-blue-700 print:text-black">
                         {getCleanLetter(q.correctAnswer)}
                       </td>
-                      <td className="border border-black p-2 text-justify italic text-[9.5pt] text-slate-800 leading-snug">
+                      <td className="border border-black p-2 text-justify italic text-[9.5pt] text-black leading-snug">
                         {q.explanation}
                       </td>
                     </tr>
@@ -333,7 +333,7 @@ const ExamOutput: React.FC<Props> = ({ data, onBack }) => {
              
              <div className="mt-12 flex justify-end">
                 <div className="text-center w-64">
-                  <p className="font-bold text-slate-600 text-sm">Andopan, {new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
+                  <p className="font-bold text-black text-sm">Andopan, {new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
                   <p className="mt-2 font-black text-black uppercase tracking-wider text-sm">Guru Kelas / Wali Kelas</p>
                   <div className="h-20"></div>
                   <p className="font-black underline text-lg text-black">NASRIWANTO, S.Pd</p>

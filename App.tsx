@@ -239,7 +239,8 @@ function App() {
         <div className="absolute top-20 left-10 w-24 h-24 bg-blue-100/40 dark:bg-blue-500/10 rounded-full blur-3xl -z-10 animate-float"></div>
         <div className="absolute bottom-20 right-10 w-32 h-32 bg-purple-100/40 dark:bg-purple-500/10 rounded-full blur-3xl -z-10 animate-float" style={{animationDelay: '1.5s'}}></div>
 
-        <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+        {/* Updated Form Container Background */}
+        <div className="max-w-4xl mx-auto bg-gradient-to-br from-white via-indigo-50/20 to-blue-50/30 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900 rounded-3xl shadow-2xl border border-white/50 dark:border-slate-700 overflow-hidden transition-all duration-300 backdrop-blur-sm">
           <div className="flex bg-slate-50/50 dark:bg-slate-900/50 p-1.5 m-3 rounded-2xl border border-slate-100 dark:border-slate-700">
             <button
               onClick={() => setActiveTab(ExamCategory.REGULAR)}
@@ -271,34 +272,34 @@ function App() {
                   <>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase ml-1">Tingkat Kelas</label>
-                      <div className="w-full px-4 py-3 bg-slate-100 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 rounded-2xl flex items-center gap-2 text-slate-700 dark:text-slate-200 font-bold opacity-80">
+                      <div className="w-full px-4 py-3 bg-slate-100/80 dark:bg-slate-700/80 border-2 border-slate-200 dark:border-slate-600 rounded-2xl flex items-center gap-2 text-slate-700 dark:text-slate-200 font-bold opacity-80 backdrop-blur-sm">
                          <CheckCircle2 size={18} className="text-blue-600 dark:text-blue-400" />
                          {classLevel}
                       </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase ml-1">Semester</label>
-                      <div className="w-full px-4 py-3 bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-700 rounded-2xl flex items-center gap-2 text-blue-700 dark:text-blue-300 font-bold">
+                      <div className="w-full px-4 py-3 bg-blue-50/80 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-700 rounded-2xl flex items-center gap-2 text-blue-700 dark:text-blue-300 font-bold backdrop-blur-sm">
                         <Calendar size={18} />
                         {semester}
                       </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase ml-1">Mata Pelajaran</label>
-                      <select value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-2xl focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100">
+                      <select value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full px-4 py-3 bg-white/80 dark:bg-slate-900/80 border-2 border-slate-200/50 dark:border-slate-700 rounded-2xl focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100 backdrop-blur-sm">
                         <option value="">-- Pilih --</option>
                         {availableSubjects.map((s, idx) => <option key={idx} value={s.name}>{s.name}</option>)}
                       </select>
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase ml-1">Jenis Ujian</label>
-                      <select value={examType} onChange={(e) => setExamType(e.target.value as ExamType)} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-2xl focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100">
+                      <select value={examType} onChange={(e) => setExamType(e.target.value as ExamType)} className="w-full px-4 py-3 bg-white/80 dark:bg-slate-900/80 border-2 border-slate-200/50 dark:border-slate-700 rounded-2xl focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100 backdrop-blur-sm">
                         {Object.values(ExamType).map(t => <option key={t} value={t}>{t}</option>)}
                       </select>
                     </div>
                     <div className="space-y-2 md:col-span-2">
                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase ml-1">Topik Utama (Materi Sem 2)</label>
-                      <select value={topic} onChange={(e) => setTopic(e.target.value)} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-2xl focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold truncate text-slate-900 dark:text-slate-100">
+                      <select value={topic} onChange={(e) => setTopic(e.target.value)} className="w-full px-4 py-3 bg-white/80 dark:bg-slate-900/80 border-2 border-slate-200/50 dark:border-slate-700 rounded-2xl focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold truncate text-slate-900 dark:text-slate-100 backdrop-blur-sm">
                         <option value="">-- Pilih Materi --</option>
                         {topicOptions.map((t, idx) => <option key={idx} value={t.value}>{t.label}</option>)}
                       </select>
@@ -308,7 +309,7 @@ function App() {
                   <>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase ml-1">Kategori (Filter)</label>
-                      <select value={tkaSubject} onChange={(e) => setTkaSubject(e.target.value)} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-2xl focus:border-purple-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100">
+                      <select value={tkaSubject} onChange={(e) => setTkaSubject(e.target.value)} className="w-full px-4 py-3 bg-white/80 dark:bg-slate-900/80 border-2 border-slate-200/50 dark:border-slate-700 rounded-2xl focus:border-purple-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100 backdrop-blur-sm">
                         <option value="Gabungan">Gabungan (Semua)</option>
                         <option value="Bahasa Indonesia">Bahasa Indonesia (Verbal)</option>
                         <option value="Matematika">Matematika (Numerik/Logika/Spasial)</option>
@@ -317,13 +318,13 @@ function App() {
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase ml-1">Mode Materi</label>
                       <div className="flex gap-2">
-                         <button type="button" onClick={() => setTkaTopicMode('ALL')} className={`flex-1 py-3 rounded-xl text-xs font-bold border-2 transition-all ${tkaTopicMode === 'ALL' ? 'bg-purple-50 dark:bg-purple-900/30 border-purple-500 text-purple-700 dark:text-purple-300' : 'bg-slate-50 dark:bg-slate-800 border-transparent text-slate-500 dark:text-slate-400'}`}>SEMUA</button>
-                         <button type="button" onClick={() => setTkaTopicMode('SPECIFIC')} className={`flex-1 py-3 rounded-xl text-xs font-bold border-2 transition-all ${tkaTopicMode === 'SPECIFIC' ? 'bg-purple-50 dark:bg-purple-900/30 border-purple-500 text-purple-700 dark:text-purple-300' : 'bg-slate-50 dark:bg-slate-800 border-transparent text-slate-500 dark:text-slate-400'}`}>PILIH</button>
+                         <button type="button" onClick={() => setTkaTopicMode('ALL')} className={`flex-1 py-3 rounded-xl text-xs font-bold border-2 transition-all ${tkaTopicMode === 'ALL' ? 'bg-purple-50/80 dark:bg-purple-900/30 border-purple-500 text-purple-700 dark:text-purple-300' : 'bg-white/50 dark:bg-slate-800 border-transparent text-slate-500 dark:text-slate-400'}`}>SEMUA</button>
+                         <button type="button" onClick={() => setTkaTopicMode('SPECIFIC')} className={`flex-1 py-3 rounded-xl text-xs font-bold border-2 transition-all ${tkaTopicMode === 'SPECIFIC' ? 'bg-purple-50/80 dark:bg-purple-900/30 border-purple-500 text-purple-700 dark:text-purple-300' : 'bg-white/50 dark:bg-slate-800 border-transparent text-slate-500 dark:text-slate-400'}`}>PILIH</button>
                       </div>
                     </div>
                     
                     {tkaTopicMode === 'SPECIFIC' && (
-                      <div className="md:col-span-2 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar">
+                      <div className="md:col-span-2 p-4 bg-slate-50/80 dark:bg-slate-900/80 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar backdrop-blur-sm">
                         {getFilteredTkaTopics().map(t => (
                           <label key={t} className="flex items-center gap-3 p-2 hover:bg-white dark:hover:bg-slate-800 rounded-xl cursor-pointer transition-colors group">
                              <input type="checkbox" checked={selectedTkaTopics.includes(t)} onChange={() => handleTkaTopicToggle(t)} className="w-4 h-4 accent-purple-600 rounded" />
@@ -335,14 +336,14 @@ function App() {
 
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase ml-1">Jumlah Soal</label>
-                      <select value={tkaCount} onChange={(e) => setTkaCount(Number(e.target.value))} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-2xl focus:border-purple-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100">
+                      <select value={tkaCount} onChange={(e) => setTkaCount(Number(e.target.value))} className="w-full px-4 py-3 bg-white/80 dark:bg-slate-900/80 border-2 border-slate-200/50 dark:border-slate-700 rounded-2xl focus:border-purple-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100 backdrop-blur-sm">
                         {[10, 15, 20].map(n => <option key={n} value={n}>{n} Soal</option>)}
                       </select>
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase ml-1">Tipe Soal TKA</label>
-                      <select value={tkaQuestionType} onChange={(e) => setTkaQuestionType(e.target.value as QuestionType)} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-2xl focus:border-purple-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100">
+                      <select value={tkaQuestionType} onChange={(e) => setTkaQuestionType(e.target.value as QuestionType)} className="w-full px-4 py-3 bg-white/80 dark:bg-slate-900/80 border-2 border-slate-200/50 dark:border-slate-700 rounded-2xl focus:border-purple-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100 backdrop-blur-sm">
                         {Object.values(QuestionType).map(t => <option key={t} value={t}>{t}</option>)}
                       </select>
                     </div>
@@ -352,7 +353,7 @@ function App() {
                 {activeTab === ExamCategory.REGULAR && (
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase ml-1">Kuantitas Soal</label>
-                    <select value={questionCount} onChange={(e) => setQuestionCount(Number(e.target.value))} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-2xl focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100">
+                    <select value={questionCount} onChange={(e) => setQuestionCount(Number(e.target.value))} className="w-full px-4 py-3 bg-white/80 dark:bg-slate-900/80 border-2 border-slate-200/50 dark:border-slate-700 rounded-2xl focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-all outline-none font-semibold text-slate-900 dark:text-slate-100 backdrop-blur-sm">
                       {[10, 15, 20, 25, 30].map(n => <option key={n} value={n}>{n} Soal</option>)}
                     </select>
                   </div>
@@ -360,14 +361,14 @@ function App() {
 
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase ml-1">Logo Instansi (Opsional)</label>
-                  <label className={`w-full h-[52px] flex items-center justify-center gap-3 rounded-2xl border-2 border-dashed transition-all cursor-pointer ${uploadedImage ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700' : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600'}`}>
+                  <label className={`w-full h-[52px] flex items-center justify-center gap-3 rounded-2xl border-2 border-dashed transition-all cursor-pointer backdrop-blur-sm ${uploadedImage ? 'bg-blue-50/80 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700' : 'bg-slate-50/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600'}`}>
                     <ImagePlus size={18} className={uploadedImage ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'} />
                     <span className={`text-sm font-bold ${uploadedImage ? 'text-blue-700 dark:text-blue-300' : 'text-slate-500 dark:text-slate-500'}`}>{uploadedImage ? 'LOGO SIAP' : 'UPLOAD LOGO'}</span>
                     <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                   </label>
                 </div>
 
-                <div className="md:col-span-2 p-5 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-700 dark:to-slate-700 rounded-3xl border border-slate-100 dark:border-slate-600 flex flex-col sm:flex-row gap-6 items-center justify-center">
+                <div className="md:col-span-2 p-5 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-slate-700/50 dark:to-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-600 flex flex-col sm:flex-row gap-6 items-center justify-center backdrop-blur-sm">
                    <div className="flex items-center gap-4 group cursor-pointer" onClick={() => setShuffleQuestions(!shuffleQuestions)}>
                       <div className={`w-12 h-6 rounded-full relative transition-all duration-300 ${shuffleQuestions ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-500'}`}>
                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${shuffleQuestions ? 'left-7' : 'left-1'}`}></div>
@@ -385,7 +386,7 @@ function App() {
 
               <div className="relative pt-4">
                 {loading ? (
-                  <div className="space-y-6 p-6 bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-700 relative">
+                  <div className="space-y-6 p-6 bg-slate-50/80 dark:bg-slate-900/80 rounded-3xl border border-slate-100 dark:border-slate-700 relative backdrop-blur-sm">
                      <div className="absolute top-0 left-0 h-1 bg-blue-600 transition-all duration-500" style={{width: `${progress}%`}}></div>
                      <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -401,7 +402,7 @@ function App() {
                       type="button" 
                       onClick={handlePreview}
                       disabled={previewLoading}
-                      className="group flex-1 py-5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-black text-lg shadow-sm hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="group flex-1 py-5 rounded-2xl bg-white/90 dark:bg-slate-800/90 border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-black text-lg shadow-sm hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed backdrop-blur-sm"
                     >
                       {previewLoading ? <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <Eye size={22} />}
                       <span className="tracking-widest uppercase text-base">Pratinjau</span>
