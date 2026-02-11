@@ -19,6 +19,7 @@ export enum ExamType {
 
 export interface Question {
   number: number;
+  type: 'Pilihan Ganda' | 'Isian'; // New Property
   isHots: boolean; // Menandai apakah soal ini High Order Thinking Skills
   stimulusText?: string; 
   question: string;

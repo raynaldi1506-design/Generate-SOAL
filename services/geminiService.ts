@@ -37,31 +37,35 @@ export const generateQuestions = async (
     title = (details.examType || "ASESMEN").toUpperCase();
     
     prompt = `
-      Bertindaklah sebagai Pakar Pembuat Soal Kurikulum Merdeka (Asesmen Nasional/AKM) untuk tingkat Sekolah Dasar.
-      Buatkan ${details.count} butir soal untuk mata pelajaran ${details.subject} Kelas ${details.classLevel}, Semester ${details.semester}, Tahun Ajaran ${details.year}.
-      Topik: ${details.topic}. Jenis Ujian: ${details.examType}.
+      Bertindaklah sebagai Pakar Pembuat Soal Kurikulum Merdeka (Asesmen Nasional/AKM) untuk SD.
       
-      ATURAN KRITIKAL:
-      1. KUNCI JAWABAN: Properti 'correctAnswer' HARUS HANYA berisi SATU HURUF saja (A, B, C, atau D). JANGAN menuliskan teks jawaban di properti ini.
-      2. KLASIFIKASI HOTS: Variasikan soal LOTS dan HOTS. Tandai HOTS dengan 'isHots: true'.
-      3. STIMULUS GAMBAR: Hanya soal HOTS yang boleh memiliki 'imageDescription'. Soal LOTS biarkan kosong.
-      4. STIMULUS TEKS: Gunakan 'stimulusText' (format HTML table jika data angka) untuk soal literasi/numerasi.
-      5. KUALITAS: Soal harus menantang logika siswa SD. 'explanation' harus mendalam.
+      TUGAS UTAMA:
+      Buat satu paket ujian yang terdiri dari DUA BAGIAN:
+      1. BAGIAN A: ${details.count} soal Pilihan Ganda (PG).
+      2. BAGIAN B: WAJIB ADA 5 soal Isian Singkat/Uraian (Essay) yang semuanya bersifat HOTS (High Order Thinking Skills).
+      
+      Konteks:
+      - Mapel: ${details.subject}
+      - Kelas: ${details.classLevel} (${details.semester})
+      - Topik: ${details.topic}
+      
+      ATURAN PENTING:
+      - Struktur JSON 'questions' harus mencakup PG dan Isian.
+      - Gunakan field 'type': 'Pilihan Ganda' atau 'Isian'.
+      - Untuk PG, 'correctAnswer' adalah satu huruf (A-D).
+      - Untuk Isian, 'correctAnswer' adalah kata kunci jawaban singkat.
+      - Bagian Isian harus menuntut analisis (C4-C6), stimulus bisa berupa studi kasus pendek.
     `;
   } else {
     title = `TES KEMAMPUAN AKADEMIK (TKA) - ${details.topic}`;
     prompt = `
-      Bertindaklah sebagai Pembuat Soal TKA (Tes Potensi Akademik) level SD Kelas 6.
-      Buatkan ${details.count} butir soal TKA dengan Topik: ${details.topic}.
-      Bentuk Soal: ${details.questionType}.
+      Bertindaklah sebagai Pembuat Soal TKA level SD Kelas 6.
+      Buatkan ${details.count} butir soal Pilihan Ganda DAN 5 soal Isian Singkat (Logika/Analisis).
+      Topik: ${details.topic}.
       
-      ATURAN KUNCI JAWABAN:
-      - Properti 'correctAnswer' HARUS HANYA berisi SATU HURUF saja (A, B, C, atau D).
-      - Jika isian (Essay), tuliskan kata kunci jawabannya secara singkat.
-      
-      ATURAN STIMULUS:
-      - Gunakan 'isHots: true' untuk soal logika/spasial.
-      - Berikan 'imageDescription' HANYA jika visual sangat diperlukan.
+      Aturan:
+      - Soal Isian harus menguji logika (HOTS).
+      - Output format JSON sama.
     `;
   }
 
@@ -79,19 +83,21 @@ export const generateQuestions = async (
               type: Type.OBJECT,
               properties: {
                 number: { type: Type.INTEGER },
+                type: { type: Type.STRING, enum: ['Pilihan Ganda', 'Isian'] },
                 isHots: { type: Type.BOOLEAN },
-                stimulusText: { type: Type.STRING },
+                stimulusText: { type: Type.STRING, description: "Teks bacaan/data (HTML allowed)" },
                 question: { type: Type.STRING },
                 options: { 
                   type: Type.ARRAY, 
-                  items: { type: Type.STRING }
+                  items: { type: Type.STRING },
+                  description: "Kosongkan array ini jika tipe soal Isian"
                 },
-                correctAnswer: { type: Type.STRING, description: "HANYA HURUF (A, B, C, atau D)" },
+                correctAnswer: { type: Type.STRING },
                 explanation: { type: Type.STRING },
                 imageDescription: { type: Type.STRING },
                 imageCaption: { type: Type.STRING }
               },
-              required: ["number", "isHots", "question", "correctAnswer", "explanation"]
+              required: ["number", "type", "isHots", "question", "correctAnswer", "explanation"]
             }
           }
         }
@@ -102,12 +108,20 @@ export const generateQuestions = async (
   const rawJSON = response.text;
   if (!rawJSON) throw new Error("Gagal mengambil data dari AI");
 
-  let questions: Question[] = JSON.parse(rawJSON).questions;
+  let allQuestions: Question[] = JSON.parse(rawJSON).questions;
 
+  // Pisahkan PG dan Isian
+  let mcqs = allQuestions.filter(q => q.type === 'Pilihan Ganda' || (q.options && q.options.length > 0));
+  let essays = allQuestions.filter(q => q.type === 'Isian' || (!q.options || q.options.length === 0));
+  
+  // Pastikan tipe data konsisten jika AI salah tagging
+  mcqs = mcqs.map(q => ({...q, type: 'Pilihan Ganda' as const}));
+  essays = essays.map(q => ({...q, type: 'Isian' as const}));
+
+  // Shuffle Logic: Hanya acak PG, Isian tetap di bawah (atau acak isian tersendiri)
   if (details.shuffleOptions) {
-    questions = questions.map(q => {
+    mcqs = mcqs.map(q => {
       if (q.options && q.options.length > 0) {
-        // Find original correct text before shuffling
         const correctLetter = q.correctAnswer.trim().toUpperCase();
         const correctIdx = correctLetter.charCodeAt(0) - 65;
         
@@ -128,10 +142,13 @@ export const generateQuestions = async (
   }
 
   if (details.shuffleQuestions) {
-    questions = shuffleArray(questions);
+    mcqs = shuffleArray(mcqs);
+    // Essays biasanya tidak diacak agar urutan logis (jika ada cerita bersambung), 
+    // tapi kalau mau diacak: essays = shuffleArray(essays);
   }
 
-  questions = questions.map((q, idx) => ({
+  // Gabungkan kembali: PG dulu, baru Isian
+  const finalQuestions = [...mcqs, ...essays].map((q, idx) => ({
     ...q,
     number: idx + 1
   }));
@@ -145,7 +162,7 @@ export const generateQuestions = async (
       semester: details.semester || "-",
       year: details.year
     },
-    questions: questions
+    questions: finalQuestions
   };
 };
 
